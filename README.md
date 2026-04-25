@@ -33,8 +33,8 @@ Selain itu, sistem juga dilengkapi dengan:
 ## ⚠️ Prepare .env
 Isi .env sesuai dengan setting komputer
 
-DB_USER=
-DB_HOST=
-DB_NAME=
-DB_PASSWORD=
-DB_PORT=
+- DB_USER=
+- DB_HOST=
+- DB_NAME=
+- DB_PASSWORD=
+- DB_PORT=
