@@ -1,4 +1,4 @@
-# 📌 Tugas UTS Pemrograman Web 2 - Task Manager API
+# 📌 UTS Pemrograman Web 2 - Task Manager API
 
 ## 👤 Identitas
 **Nama:** Muhammad Kamil Marzuqi Aziz  
