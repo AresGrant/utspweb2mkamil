@@ -1,0 +1,98 @@
+require('dotenv').config();
+const express = require('express');
+const { Pool } = require('pg');
+
+const app = express();
+app.use(express.json());
+
+// ================= DATABASE =================
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+});
+
+// ================= MIDDLEWARE LOGGING =================
+app.use((req, res, next) => {
+  const time = new Date().toISOString();
+  console.log(`${req.method} ${req.url} - ${time}`);
+  next();
+});
+
+// ================= GET ALL TASKS =================
+app.get('/tasks', async (req, res) => {
+  const result = await pool.query('SELECT * FROM tasks ORDER BY id');
+  res.json(result.rows);
+});
+
+// ================= GET TASK BY ID =================
+app.get('/tasks/:id', async (req, res) => {
+  const { id } = req.params;
+  const result = await pool.query('SELECT * FROM tasks WHERE id = $1', [id]);
+
+  if (result.rows.length === 0) {
+    return res.status(404).json({ message: 'Task tidak ditemukan' });
+  }
+
+  res.json(result.rows[0]);
+});
+
+// ================= CREATE TASK =================
+app.post('/tasks', async (req, res) => {
+  let { title, description } = req.body;
+
+  // VALIDASI
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ message: 'Title tidak boleh kosong' });
+  }
+
+  const result = await pool.query(
+    'INSERT INTO tasks (title, description) VALUES ($1, $2) RETURNING *',
+    [title.trim(), description]
+  );
+
+  res.status(201).json(result.rows[0]);
+});
+
+// ================= UPDATE TASK =================
+app.put('/tasks/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, description, is_completed } = req.body;
+
+  const check = await pool.query('SELECT * FROM tasks WHERE id = $1', [id]);
+
+  if (check.rows.length === 0) {
+    return res.status(404).json({ message: 'Task tidak ditemukan' });
+  }
+
+  const result = await pool.query(
+    `UPDATE tasks 
+     SET title=$1, description=$2, is_completed=$3 
+     WHERE id=$4 RETURNING *`,
+    [title, description, is_completed, id]
+  );
+
+  res.json(result.rows[0]);
+});
+
+// ================= DELETE TASK =================
+app.delete('/tasks/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const check = await pool.query('SELECT * FROM tasks WHERE id = $1', [id]);
+
+  if (check.rows.length === 0) {
+    return res.status(404).json({ message: 'Task tidak ditemukan' });
+  }
+
+  await pool.query('DELETE FROM tasks WHERE id = $1', [id]);
+
+  res.json({ message: 'Task berhasil dihapus' });
+});
+
+// ================= SERVER =================
+app.listen(3000, () => {
+  console.log('Server berjalan di http://localhost:3000');
+});
