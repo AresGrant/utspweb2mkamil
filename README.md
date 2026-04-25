@@ -28,4 +28,13 @@ Selain itu, sistem juga dilengkapi dengan:
 - GET /tasks/:id  
 - POST /tasks  
 - PUT /tasks/:id  
-- DELETE /tasks/:id  
+- DELETE /tasks/:id
+
+## ⚠️ Prepare .env
+Isi .env sesuai dengan setting komputer
+
+DB_USER=
+DB_HOST=
+DB_NAME=
+DB_PASSWORD=
+DB_PORT=
